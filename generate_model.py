@@ -24,35 +24,13 @@ BOT_NAME = 'Amara'
 TIME_PRECISION = 2
 STAT_PRECISION = 5
 HOUR = 3600 # secs
-OUTPUT_CHANNEL = 1001937090084356096
-# general 975212076811296810
-# testing 975212341232812052
-# old-data-test-run-1 990408172344844288
-# old-data-test-run-2 991027816705445888
-# old-data-test-run-3 991038996572426302
-# first-dataset-run-1 993535424138072064
-# second-dataset-run-1 993543370016292945
-# second-dataset-run-2 993919067473846282
-# second-dataset-run-3 994288944323756073
-# second-dataset-run-4 994769712221265990
-# sand-testing 997238449654468789
-# sand-2-classes-1 998745433813815366
-# sand-2-classes-2 998758099781419100
-# sand-2-classes-3 998767762191155260
-# sand-2-classes-4 998772013323780187
-# s2c-5 998785319258308728
-# overkill-1 998793935872868402
-# s2c-6 998997369729323058
-# s2c-7 999035118238843012
-# s2c-8 999111903869677649
-# s2c-9 999143115514454066
-# overkill-2 1001937090084356096
+OUTPUT_CHANNEL = 1119338645799841853
 
 # Neural Network Constants
 IMG_WIDTH = 400
 IMG_HEIGHT = 400
-TRAIN_DATA_DIR = 'third_dataset/train'
-VALIDATION_DATA_DIR ='third_dataset/validation'
+TRAIN_DATA_DIR = 'data/train'
+VALIDATION_DATA_DIR ='data/validation'
 NB_TRAIN_SAMPLES = 75
 NB_VALIDATION_SAMPLES = 50
 EPOCHS = 10000
@@ -63,6 +41,9 @@ PATIENCE = 300
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
+MODEL_PATH = 'models'
+TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
+  time.localtime()) # unique label tied to date and time
 
 ######################
 ### Nerual Network ###
@@ -111,7 +92,7 @@ def build_model():
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
    
-    model.compile(loss = 'binary_crossentropy',
+    model.compile(loss = 'categorical_crossentropy',
                   optimizer = 'rmsprop',
                   metrics = ['accuracy'])
     return model
@@ -133,13 +114,13 @@ def train_model(model):
             TRAIN_DATA_DIR,
             target_size = (IMG_WIDTH, IMG_HEIGHT),
             batch_size = BATCH_SIZE,
-            class_mode = 'binary')
+            class_mode = 'categorical')
    
     validation_generator = test_datagen.flow_from_directory(
             VALIDATION_DATA_DIR,
             target_size = (IMG_WIDTH,IMG_HEIGHT),
             batch_size = BATCH_SIZE,
-            class_mode = 'binary')
+            class_mode = 'categorical')
     
     # Added Early Stopping
     my_callback = [EarlyStopping(
@@ -162,9 +143,9 @@ def train_model(model):
    
 def save_model(model):
     json_model = model.to_json()
-    with open('json_model.json', 'w') as json_file:
+    with open(f'{MODEL_PATH}/json_model_{TIME_LABEL}.json', 'w') as json_file:
         json_file.write(json_model)
-    model.save('saved_model.h5')
+    model.save(f'{MODEL_PATH}/saved_model{TIME_LABEL}.h5')
    
 def run_model():
     built_model = None

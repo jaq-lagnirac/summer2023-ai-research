@@ -160,16 +160,6 @@ def run_model():
     loss_str = "Min Loss at Epoch " + str(min_loss_epoch) + " ==> " + str(min_loss)
     print(loss_str)
     
-#'''    
-    #plt.plot(val_acc, 'r', 'val_acc')
-    #plt.plot(val_loss, 'g', 'val_loss')
-    #plt.plot(val_loss)
-    #plt.title('Validation Accuracy and Loss Over Time')
-    #plt.xlabel('Epoch')
-    #plt.ylabel('Percent')
-    #plt.legend(loc = 'upper left')
-    #plt.show()
-    
     num_epochs = len(val_loss)
     min_loss_acc = val_acc[min_loss_epoch - 1] # starts index at zero
 

@@ -43,13 +43,14 @@ MONITOR = 'val_loss'
 DROPOUT = 0.5
 TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
     time.localtime()) # unique label tied to date and time
+DATA_FOLDERS = 10
 
 # Paths
 paths = {
     'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
     'VALIDATION_DATA_DIR' : os.path.join('data', 'validation'),
-    'JSON_OUTPUT' : os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
-    'HDF5_OUTPUT' : os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
+    'JSON_OUTPUT' : os.path.join('models', f'json_model_{TIME_LABEL}.json'),
+    'HDF5_OUTPUT' : os.path.join('models', f'saved_model_{TIME_LABEL}.h5')
 }
 
 ######################
@@ -80,7 +81,7 @@ def build_model():
     model.add(Dense(64))
     model.add(Activation('relu'))
     model.add(Dropout(DROPOUT))
-    model.add(Dense(1))
+    model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
     model.add(Activation('sigmoid'))
    
     model.compile(loss = 'categorical_crossentropy',
@@ -173,7 +174,7 @@ def run_model():
 
 load_dotenv() # loads in local .env file
 
-client = discord.Client() # creates instance of client
+client = discord.Client(intents=discord.Intents.default()) # creates instance of client
 TOKEN = os.getenv('DISCORD_TOKEN') # gets key from .env
 
 ######################

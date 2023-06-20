@@ -1,3 +1,6 @@
+### Justin Caringal
+# Generates JSON and HDF5 tensorflow model from local directory
+
 # Neural Network Libraries
 import gc
 from tkinter import ROUND
@@ -15,7 +18,6 @@ if typing.TYPE_CHECKING:
 # Discord Libraries
 import os # allows program to read in discord bot token
 import discord # allows interface with discord bot api
-# import nest_asyncio # allows infinite running event loop
 from dotenv import load_dotenv # loads in .env file
 import time # allows for timestamps and elapsed time
 
@@ -29,8 +31,6 @@ OUTPUT_CHANNEL = 1119338645799841853
 # Neural Network Constants
 IMG_WIDTH = 400
 IMG_HEIGHT = 400
-TRAIN_DATA_DIR = 'data/train'
-VALIDATION_DATA_DIR ='data/validation'
 NB_TRAIN_SAMPLES = 75
 NB_VALIDATION_SAMPLES = 50
 EPOCHS = 10000
@@ -41,9 +41,16 @@ PATIENCE = 300
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
-MODEL_PATH = 'models'
 TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
-  time.localtime()) # unique label tied to date and time
+    time.localtime()) # unique label tied to date and time
+
+# Paths
+paths = {
+    'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
+    'VALIDATION_DATA_DIR' : os.path.join('data', 'validation'),
+    'JSON_OUTPUT' : os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
+    'HDF5_OUTPUT' : os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
+}
 
 ######################
 ### Nerual Network ###
@@ -60,24 +67,8 @@ def build_model():
     model.add(Conv2D(32, (3, 3), input_shape=in_shape))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
-   
-    model.add(Conv2D(1024, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-
-    model.add(Conv2D(1024, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-
-    model.add(Conv2D(1024, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-
-    model.add(Conv2D(1024, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-
-    model.add(Conv2D(1024, (3, 3)))
+    
+    model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
    
@@ -111,13 +102,13 @@ def train_model(model):
         )
    
     train_generator = train_datagen.flow_from_directory(
-            TRAIN_DATA_DIR,
+            paths['TRAIN_DATA_DIR'],
             target_size = (IMG_WIDTH, IMG_HEIGHT),
             batch_size = BATCH_SIZE,
             class_mode = 'categorical')
    
     validation_generator = test_datagen.flow_from_directory(
-            VALIDATION_DATA_DIR,
+            paths['VALIDATION_DATA_DIR'],
             target_size = (IMG_WIDTH,IMG_HEIGHT),
             batch_size = BATCH_SIZE,
             class_mode = 'categorical')
@@ -143,9 +134,9 @@ def train_model(model):
    
 def save_model(model):
     json_model = model.to_json()
-    with open(f'{MODEL_PATH}/json_model_{TIME_LABEL}.json', 'w') as json_file:
+    with open(paths['JSON_OUTPUT'], 'w') as json_file:
         json_file.write(json_model)
-    model.save(f'{MODEL_PATH}/saved_model{TIME_LABEL}.h5')
+    model.save(paths['HDF5_OUTPUT'])
    
 def run_model():
     built_model = None
@@ -183,18 +174,13 @@ def run_model():
     min_loss_acc = val_acc[min_loss_epoch - 1] # starts index at zero
 
     return min_loss, max_acc, num_epochs, min_loss_epoch, max_acc_epoch, min_loss_acc
-#'''
 
-#main()
 
-#'''
-#'''
 
 ######################
 ### Discord Code #####
 ######################
 
-# nest_asyncio.apply() # allows infinite running event loop
 load_dotenv() # loads in local .env file
 
 client = discord.Client() # creates instance of client
@@ -238,7 +224,13 @@ async def on_ready():
         await output.send(iter_str)
         
         # iteration run
-        min_loss_iter, max_acc_iter, num_epochs, min_loss_epoch, max_acc_epoch, min_loss_acc = run_model() # runs model, stores variables
+        min_loss_iter, \
+            max_acc_iter, \
+            num_epochs, \
+            min_loss_epoch, \
+            max_acc_epoch, \
+            min_loss_acc \
+            = run_model() # runs model, stores variables
 
         # rounds numbers
         min_loss_str = round(min_loss_iter, STAT_PRECISION)

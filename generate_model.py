@@ -151,14 +151,14 @@ def run_model():
     val_acc = history_1.history['val_acc']
     max_acc = max(val_acc)
     max_acc_epoch = val_acc.index(max_acc) + 1
-    acc_str = "Max Accuracy at Epoch " + str(max_acc_epoch) + " ==> " + str(max_acc)
+    acc_str = f'Max Accuracy at Epoch {max_acc_epoch} ==> {max_acc}'
     print(acc_str)
     
     # Prints out min validation loss and epoch that it occured at
     val_loss = history_1.history['val_loss']
     min_loss = min(val_loss)
     min_loss_epoch = val_loss.index(min_loss) + 1 # plus 1 for display
-    loss_str = "Min Loss at Epoch " + str(min_loss_epoch) + " ==> " + str(min_loss)
+    loss_str = f'Min Loss at Epoch {min_loss_epoch} ==> {min_loss}'
     print(loss_str)
     
     num_epochs = len(val_loss)

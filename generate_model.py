@@ -29,8 +29,8 @@ HOUR = 3600 # secs
 OUTPUT_CHANNEL = 1119338645799841853
 
 # Neural Network Constants
-IMG_WIDTH = 400
-IMG_HEIGHT = 400
+IMG_WIDTH = 100
+IMG_HEIGHT = 100
 NB_TRAIN_SAMPLES = 50
 NB_VALIDATION_SAMPLES = 5
 EPOCHS = 100
@@ -52,7 +52,14 @@ paths = {
     'JSON_OUTPUT' : os.path.join('models', f'json_model_{TIME_LABEL}.json'),
     'HDF5_OUTPUT' : os.path.join('models', f'saved_model_{TIME_LABEL}.h5')
 }
-
+'''
+paths = {
+    'TRAIN_DATA_DIR' : 'data/train',
+    'VALIDATION_DATA_DIR' : 'data/validation',
+    'JSON_OUTPUT' : f'models/json_model_{TIME_LABEL}.json',
+    'HDF5_OUTPUT' : f'models/saved_model_{TIME_LABEL}.h5'
+}
+'''
 ######################
 ### Nerual Network ###
 ######################
@@ -123,7 +130,7 @@ def train_model(model):
         baseline = 1,
         restore_best_weights = True)]
 
-    history_1 = model.fit_generator(
+    history_1 = model.fit(
         train_generator,
         steps_per_epoch = NB_VALIDATION_SAMPLES // BATCH_SIZE,
         epochs = EPOCHS,

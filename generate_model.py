@@ -31,13 +31,13 @@ OUTPUT_CHANNEL = 1119338645799841853
 # Neural Network Constants
 IMG_WIDTH = 100
 IMG_HEIGHT = 100
-NB_TRAIN_SAMPLES = 50
-NB_VALIDATION_SAMPLES = 5
+NB_TRAIN_SAMPLES = 75
+NB_VALIDATION_SAMPLES = 30
 EPOCHS = 100
-BATCH_SIZE = 10
+BATCH_SIZE = 20
 MIN_LOSS_THRESHOLD = 0.1
-MAX_ACC_THRESHOLD = 0.9
-PATIENCE = 5
+MAX_ACC_THRESHOLD = 0.90
+PATIENCE = 100
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
@@ -52,14 +52,7 @@ paths = {
     'JSON_OUTPUT' : os.path.join('models', f'json_model_{TIME_LABEL}.json'),
     'HDF5_OUTPUT' : os.path.join('models', f'saved_model_{TIME_LABEL}.h5')
 }
-'''
-paths = {
-    'TRAIN_DATA_DIR' : 'data/train',
-    'VALIDATION_DATA_DIR' : 'data/validation',
-    'JSON_OUTPUT' : f'models/json_model_{TIME_LABEL}.json',
-    'HDF5_OUTPUT' : f'models/saved_model_{TIME_LABEL}.h5'
-}
-'''
+
 ######################
 ### Nerual Network ###
 ######################
@@ -130,7 +123,7 @@ def train_model(model):
         baseline = 1,
         restore_best_weights = True)]
 
-    history_1 = model.fit(
+    history_1 = model.fit_generator(
         train_generator,
         steps_per_epoch = NB_VALIDATION_SAMPLES // BATCH_SIZE,
         epochs = EPOCHS,
@@ -172,11 +165,11 @@ def run_model():
     min_loss_acc = val_acc[min_loss_epoch - 1] # starts index at zero
 
     return min_loss, \
-        max_acc, \
-        num_epochs, \
-        min_loss_epoch, \
-        max_acc_epoch, \
-        min_loss_acc
+      max_acc, \
+      num_epochs, \
+      min_loss_epoch, \
+      max_acc_epoch, \
+      min_loss_acc
 
 
 

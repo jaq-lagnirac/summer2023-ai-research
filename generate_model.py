@@ -171,12 +171,7 @@ def run_model():
     num_epochs = len(val_loss)
     min_loss_acc = val_acc[min_loss_epoch - 1] # starts index at zero
 
-    return min_loss, \
-        max_acc, \
-        num_epochs, \
-        min_loss_epoch, \
-        max_acc_epoch, \
-        min_loss_acc
+    return min_loss, max_acc, num_epochs, min_loss_epoch, max_acc_epoch, min_loss_acc
 
 
 
@@ -228,13 +223,7 @@ async def on_ready():
         await output.send(iter_str)
         
         # iteration run
-        min_loss_iter, \
-            max_acc_iter, \
-            num_epochs, \
-            min_loss_epoch, \
-            max_acc_epoch, \
-            min_loss_acc \
-            = run_model() # runs model, stores variables
+        min_loss_iter, max_acc_iter, num_epochs, min_loss_epoch, max_acc_epoch, min_loss_acc = run_model() # runs model, stores variables
 
         # rounds numbers
         min_loss_str = round(min_loss_iter, STAT_PRECISION)

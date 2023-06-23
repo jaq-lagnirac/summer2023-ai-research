@@ -204,7 +204,8 @@ async def on_ready():
     min_loss_iter = 100.0 # Just an initializing dummy value
     max_acc_iter = 0.0 # Just an initializing dummy value
     counter = 0
-    while ((min_loss_iter >= MIN_LOSS_THRESHOLD) or (max_acc_iter <= MAX_ACC_THRESHOLD)):
+    while ((min_loss_iter >= MIN_LOSS_THRESHOLD) \
+        or (max_acc_iter <= MAX_ACC_THRESHOLD)):
         counter += 1
 
         # start of iteration

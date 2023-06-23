@@ -164,7 +164,12 @@ def run_model():
     num_epochs = len(val_loss)
     min_loss_acc = val_acc[min_loss_epoch - 1] # starts index at zero
 
-    return min_loss, max_acc, num_epochs, min_loss_epoch, max_acc_epoch, min_loss_acc
+    return min_loss, \
+      max_acc, \
+      num_epochs, \
+      min_loss_epoch, \
+      max_acc_epoch, \
+      min_loss_acc
 
 
 

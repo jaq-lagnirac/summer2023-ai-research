@@ -29,15 +29,15 @@ HOUR = 3600 # secs
 OUTPUT_CHANNEL = 1119338645799841853
 
 # Neural Network Constants
-IMG_WIDTH = 100
-IMG_HEIGHT = 100
-NB_TRAIN_SAMPLES = 50
-NB_VALIDATION_SAMPLES = 5
-EPOCHS = 100
-BATCH_SIZE = 10
-MIN_LOSS_THRESHOLD = 0.1
-MAX_ACC_THRESHOLD = 0.9
-PATIENCE = 5
+IMG_WIDTH = 400
+IMG_HEIGHT = 400
+NB_TRAIN_SAMPLES = 75
+NB_VALIDATION_SAMPLES = 50
+EPOCHS = 10000
+BATCH_SIZE = 20
+MIN_LOSS_THRESHOLD = 0.005
+MAX_ACC_THRESHOLD = 0.95
+PATIENCE = 300
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
@@ -52,14 +52,7 @@ paths = {
     'JSON_OUTPUT' : os.path.join('models', f'json_model_{TIME_LABEL}.json'),
     'HDF5_OUTPUT' : os.path.join('models', f'saved_model_{TIME_LABEL}.h5')
 }
-'''
-paths = {
-    'TRAIN_DATA_DIR' : 'data/train',
-    'VALIDATION_DATA_DIR' : 'data/validation',
-    'JSON_OUTPUT' : f'models/json_model_{TIME_LABEL}.json',
-    'HDF5_OUTPUT' : f'models/saved_model_{TIME_LABEL}.h5'
-}
-'''
+
 ######################
 ### Nerual Network ###
 ######################
@@ -130,7 +123,7 @@ def train_model(model):
         baseline = 1,
         restore_best_weights = True)]
 
-    history_1 = model.fit(
+    history_1 = model.fit_generator(
         train_generator,
         steps_per_epoch = NB_VALIDATION_SAMPLES // BATCH_SIZE,
         epochs = EPOCHS,
@@ -158,25 +151,20 @@ def run_model():
     val_acc = history_1.history['val_acc']
     max_acc = max(val_acc)
     max_acc_epoch = val_acc.index(max_acc) + 1
-    acc_str = f'Max Accuracy at Epoch {max_acc_epoch} ==> {max_acc}'
+    acc_str = "Max Accuracy at Epoch " + str(max_acc_epoch) + " ==> " + str(max_acc)
     print(acc_str)
     
     # Prints out min validation loss and epoch that it occured at
     val_loss = history_1.history['val_loss']
     min_loss = min(val_loss)
     min_loss_epoch = val_loss.index(min_loss) + 1 # plus 1 for display
-    loss_str = f'Min Loss at Epoch {min_loss_epoch} ==> {min_loss}'
+    loss_str = "Min Loss at Epoch " + str(min_loss_epoch) + " ==> " + str(min_loss)
     print(loss_str)
     
     num_epochs = len(val_loss)
     min_loss_acc = val_acc[min_loss_epoch - 1] # starts index at zero
 
-    return min_loss, \
-        max_acc, \
-        num_epochs, \
-        min_loss_epoch, \
-        max_acc_epoch, \
-        min_loss_acc
+    return min_loss, max_acc, num_epochs, min_loss_epoch, max_acc_epoch, min_loss_acc
 
 
 
@@ -216,8 +204,7 @@ async def on_ready():
     min_loss_iter = 100.0 # Just an initializing dummy value
     max_acc_iter = 0.0 # Just an initializing dummy value
     counter = 0
-    while ((min_loss_iter >= MIN_LOSS_THRESHOLD) \
-        or (max_acc_iter <= MAX_ACC_THRESHOLD)):
+    while ((min_loss_iter >= MIN_LOSS_THRESHOLD) or (max_acc_iter <= MAX_ACC_THRESHOLD)):
         counter += 1
 
         # start of iteration

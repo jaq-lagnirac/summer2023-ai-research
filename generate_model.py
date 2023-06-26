@@ -31,7 +31,7 @@ OUTPUT_CHANNEL = 1119338645799841853
 # Neural Network Constants
 IMG_WIDTH = 100
 IMG_HEIGHT = 100
-NB_TRAIN_SAMPLES = 75
+NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 100
 BATCH_SIZE = 20
@@ -123,9 +123,9 @@ def train_model(model):
         baseline = 1,
         restore_best_weights = True)]
 
-    history_1 = model.fit_generator(
+    history_1 = model.fit(
         train_generator,
-        steps_per_epoch = NB_VALIDATION_SAMPLES // BATCH_SIZE,
+        steps_per_epoch = NB_TRAIN_SAMPLES // BATCH_SIZE,
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
@@ -146,9 +146,11 @@ def run_model():
     built_model = build_model()
     trained_model, history_1 = train_model(built_model)
     save_model(trained_model)
+    
+#    print(history_1.history.keys()) # dict_keys(['loss', 'accuracy', 'val_loss', 'val_accuracy'])
 
     # Prints out max validation accuracy and epoch that it occured at
-    val_acc = history_1.history['val_acc']
+    val_acc = history_1.history['val_accuracy']
     max_acc = max(val_acc)
     max_acc_epoch = val_acc.index(max_acc) + 1
     acc_str = f'Max Accuracy at Epoch {max_acc_epoch} ==> {max_acc}'
@@ -216,7 +218,8 @@ async def on_ready():
         # start of iteration
         iter_start = time.time()
         current_var = time.ctime(iter_start)
-        iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n---'
+        iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n'
+        iter_str += f'Time label: {TIME_LABEL}\n---'
         print(iter_str)
         await output.send(iter_str)
         
@@ -237,13 +240,19 @@ async def on_ready():
         iter_end = time.time()
         current_var = time.ctime(iter_end)
         iter_elapsed = round(iter_end - iter_start, TIME_PRECISION)
+        
+        # file locations
+        json_location = paths['JSON_OUTPUT']
+        hdf5_location = paths['HDF5_OUTPUT']
 
         # end of iteration
         iter_str = f'***End of Iteration {counter}***\nEnd time: {current_var}\n'
-        iter_str = iter_str + f'Iteration Elapsed: {num_epochs} epochs, {iter_elapsed} seconds\n'
-        iter_str = iter_str + f'Max Val Accuracy: Epoch {max_acc_epoch}, {max_acc_str}\n'
-        iter_str = iter_str + f'Min Val Loss: Epoch {min_loss_epoch}, **{min_loss_str}**\n'
-        iter_str = iter_str + f'Val Accuracy at Epoch {min_loss_epoch}: {min_loss_acc}\n\n\n---'
+        iter_str += f'Iteration Elapsed: {num_epochs} epochs, {iter_elapsed} seconds\n'
+        iter_str += f'Max Val Accuracy: Epoch {max_acc_epoch}, {max_acc_str}\n'
+        iter_str += f'Min Val Loss: Epoch {min_loss_epoch}, **{min_loss_str}**\n'
+        iter_str += f'Val Accuracy at Epoch {min_loss_epoch}: {min_loss_acc}\n'
+        iter_str += f'JSON Relative File Path Name: {json_location}\n'
+        iter_str += f'HDF5 Relative File Path Name: {hdf5_location}\n\n\n---'
         print(iter_str)
         await output.send(iter_str)
     

@@ -50,13 +50,13 @@ DATA_FOLDERS = 10
 
 ### Setting Up Local Working Directories ###
 
-TIME_LABEL = 'DUMMY VALUE'
+TIME_LABEL = 'GLOBAL DUMMY'
 
 paths = {
     'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
     'VALIDATION_DATA_DIR' : os.path.join('data', 'validation'),
     'TEST_DATA_DIR' : os.path.join('data', 'test'),
-    'MODEL_DIR' : 'DUMMY VALUE'
+    'MODEL_DIR' : 'GLOABL DUMMY'
 }
 
         
@@ -245,10 +245,12 @@ async def on_ready():
         current_var = time.ctime(iter_start)
         generate_dirs() # sets variables, generates directories
         
-        category = client.get_channel(CATEGORY)
         channel_str = f'{CHANNEL_NAME}-{TIME_LABEL}'
+        guild = general.guild
+        await guild.create_category(CHANNEL_NAME)
+        category = discord.utils.get(guild.categories, name=CHANNEL_NAME)
         await category.create_text_channel(channel_str)
-        output = discord.utils.get(category.guild.text_channels, name=channel_str)
+        output = discord.utils.get(guild.text_channels, name=channel_str)
         
         iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n---'
         print(iter_str)

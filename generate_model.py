@@ -26,7 +26,10 @@ BOT_NAME = 'Amara'
 TIME_PRECISION = 2
 STAT_PRECISION = 5
 HOUR = 3600 # secs
-OUTPUT_CHANNEL = 1119338645799841853
+TESTING_CHANNEL = 1119338645799841853
+GENERAL_CHANNEL = TESTING_CHANNEL # 1119338497128542380
+CHANNEL_NAME = 'test'
+CATEGORY = 1119338497128542378
 
 # Neural Network Constants
 IMG_WIDTH = 100
@@ -35,8 +38,8 @@ NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 100
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 1.0 # set to 1.0 to run once
-MAX_ACC_THRESHOLD = 0.0 # set to 0.0 to run once
+MIN_LOSS_THRESHOLD = 0.1
+MAX_ACC_THRESHOLD = 0.90
 PATIENCE = 100
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
@@ -156,7 +159,6 @@ def save_model(model):
     json_model = model.to_json()
     
     # Output models
-    generate_dirs()
     json_output = os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
     hdf5_output = os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
     
@@ -223,12 +225,12 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
     print(f'Start time: {start_var}')
     await client.wait_until_ready()
-    output = client.get_channel(OUTPUT_CHANNEL) # channel that will output
+    general = client.get_channel(GENERAL_CHANNEL) # channel that will output
     start_str = f'***{BOT_NAME} online. Beginning neural network.***\n'
     start_str = start_str + f'Maximum Accuracy Threshold: **{MAX_ACC_THRESHOLD}**\n'
     start_str = start_str + f'Minimum Loss Threshold: **{MIN_LOSS_THRESHOLD}**\n'
     start_str = start_str + f'Program start time: {start_var}\n\n\n---'
-    await output.send(start_str)
+    await general.send(start_str)
 
     # bulk of program run
     min_loss_iter = 100.0 # Just an initializing dummy value
@@ -241,9 +243,18 @@ async def on_ready():
         # start of iteration
         iter_start = time.time()
         current_var = time.ctime(iter_start)
+        generate_dirs() # sets variables, generates directories
+        
+        category = client.get_channel(CATEGORY)
+        channel_str = f'{CHANNEL_NAME}-{TIME_LABEL}'
+        await category.create_text_channel(channel_str)
+        output = discord.utils.get(category.guild.text_channels, name=channel_str)
+        
         iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n---'
         print(iter_str)
         await output.send(iter_str)
+        
+        
         
         # iteration run
         min_loss_iter, \

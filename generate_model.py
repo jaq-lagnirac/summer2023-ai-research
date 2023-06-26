@@ -49,13 +49,26 @@ DATA_FOLDERS = 10
 paths = {
     'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
     'VALIDATION_DATA_DIR' : os.path.join('data', 'validation'),
-    'JSON_OUTPUT' : os.path.join('models', f'json_model_{TIME_LABEL}.json'),
-    'HDF5_OUTPUT' : os.path.join('models', f'saved_model_{TIME_LABEL}.h5')
+    'TEST_DATA_DIR' : os.path.join('data', 'test'),
+    'MODEL_DIR' : os.path.join('models', f'outputs_{TIME_LABEL}')
 }
 
-######################
-### Nerual Network ###
-######################
+
+
+### Setting Up Local Working Directories ###
+
+for path in paths:
+    if not os.path.exists(paths[path]):
+        print(f'Creating {paths[path]}')
+        os.mkdir(paths[path])
+    else:
+        print(f'{path} already exists')
+
+
+
+
+### Neural Network ###
+
 
 def build_model():
    
@@ -88,6 +101,7 @@ def build_model():
                   optimizer = 'rmsprop',
                   metrics = ['accuracy'])
     return model
+
 
 def train_model(model):
     # Augmentation configuration for training
@@ -133,11 +147,17 @@ def train_model(model):
    
     return model, history_1
    
+   
 def save_model(model):
     json_model = model.to_json()
-    with open(paths['JSON_OUTPUT'], 'w') as json_file:
+    
+    # Output models
+    json_output = os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
+    hdf5_output = os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
+    
+    with open(json_output, 'w') as json_file:
         json_file.write(json_model)
-    model.save(paths['HDF5_OUTPUT'])
+    model.save(hdf5_output)
    
 def run_model():
     built_model = None
@@ -175,18 +195,16 @@ def run_model():
 
 
 
-######################
 ### Discord Code #####
-######################
 
 load_dotenv() # loads in local .env file
 
 client = discord.Client(intents=discord.Intents.default()) # creates instance of client
 TOKEN = os.getenv('DISCORD_TOKEN') # gets key from .env
 
-######################
+
+
 ### Discord/Main #####
-######################
 
 @client.event
 async def on_ready():
@@ -241,9 +259,8 @@ async def on_ready():
         current_var = time.ctime(iter_end)
         iter_elapsed = round(iter_end - iter_start, TIME_PRECISION)
         
-        # file locations
-        json_location = paths['JSON_OUTPUT']
-        hdf5_location = paths['HDF5_OUTPUT']
+        # file location
+        model_dir = paths['MODEL_DIR']
 
         # end of iteration
         iter_str = f'***End of Iteration {counter}***\nEnd time: {current_var}\n'
@@ -251,8 +268,7 @@ async def on_ready():
         iter_str += f'Max Val Accuracy: Epoch {max_acc_epoch}, {max_acc_str}\n'
         iter_str += f'Min Val Loss: Epoch {min_loss_epoch}, **{min_loss_str}**\n'
         iter_str += f'Val Accuracy at Epoch {min_loss_epoch}: {min_loss_acc}\n'
-        iter_str += f'JSON Relative File Path Name: {json_location}\n'
-        iter_str += f'HDF5 Relative File Path Name: {hdf5_location}\n\n\n---'
+        iter_str += f'Models Directory: {model_dir}\n\n\n---'
         print(iter_str)
         await output.send(iter_str)
     

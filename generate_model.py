@@ -60,9 +60,9 @@ paths = {
 for path in paths:
     if not os.path.exists(paths[path]):
         print(f'Creating {paths[path]}')
-        os.mkdir(paths[path])
+        os.makedirs(paths[path])
     else:
-        print(f'{path} already exists')
+        print(f'{paths[path]} already exists')
 
 
 

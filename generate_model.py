@@ -35,36 +35,40 @@ NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 100
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 0.1
-MAX_ACC_THRESHOLD = 0.90
+MIN_LOSS_THRESHOLD = 1.0 # set to 1.0 to run once
+MAX_ACC_THRESHOLD = 0.0 # set to 0.0 to run once
 PATIENCE = 100
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
-TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
-    time.localtime()) # unique label tied to date and time
 DATA_FOLDERS = 10
-
-# Paths
-paths = {
-    'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
-    'VALIDATION_DATA_DIR' : os.path.join('data', 'validation'),
-    'TEST_DATA_DIR' : os.path.join('data', 'test'),
-    'MODEL_DIR' : os.path.join('models', f'outputs_{TIME_LABEL}')
-}
 
 
 
 ### Setting Up Local Working Directories ###
 
-for path in paths:
-    if not os.path.exists(paths[path]):
-        print(f'Creating {paths[path]}')
-        os.makedirs(paths[path])
-    else:
-        print(f'{paths[path]} already exists')
+TIME_LABEL = 'DUMMY VALUE'
 
+paths = {
+    'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
+    'VALIDATION_DATA_DIR' : os.path.join('data', 'validation'),
+    'TEST_DATA_DIR' : os.path.join('data', 'test'),
+    'MODEL_DIR' : 'DUMMY VALUE'
+}
 
+        
+def generate_dirs():
+    global TIME_LABEL
+    global paths
+    
+    TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
+        time.localtime()) # unique label tied to date and time
+    
+    paths['MODEL_DIR'] = os.path.join('models', f'outputs_{TIME_LABEL}')
+    model_dir = paths['MODEL_DIR']
+    print(f'Creating model directory {model_dir}')
+    os.makedirs(paths['MODEL_DIR'])
+    
 
 
 ### Neural Network ###
@@ -152,6 +156,7 @@ def save_model(model):
     json_model = model.to_json()
     
     # Output models
+    generate_dirs()
     json_output = os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
     hdf5_output = os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
     
@@ -236,8 +241,7 @@ async def on_ready():
         # start of iteration
         iter_start = time.time()
         current_var = time.ctime(iter_start)
-        iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n'
-        iter_str += f'Time label: {TIME_LABEL}\n---'
+        iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n---'
         print(iter_str)
         await output.send(iter_str)
         

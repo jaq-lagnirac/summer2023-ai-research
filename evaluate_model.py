@@ -5,6 +5,18 @@ import os, sys; sys
 import argparse
 import logging
 
+import discord
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
+
+import typing
+from tensorflow import keras as K
+if typing.TYPE_CHECKING:
+    from keras.api._v2 import keras
+    
+    
+
 SCRIPT_PATH = os.path.abspath(__file__)
 FORMAT = '[%(asctime)s] %(levelname)s %(message)s'
 l = logging.getLogger()
@@ -36,3 +48,17 @@ if args.verbose:
   l.setLevel(logging.DEBUG)
 
 debug('%s begin', SCRIPT_PATH)
+
+test_datagen = ImageDataGenerator(rescale = 1./255)
+
+test_generator = test_datagen.flow_from_directory(
+    paths['VALIDATION_DATA_DIR'],
+    target_size = (IMG_WIDTH,IMG_HEIGHT),
+    batch_size = BATCH_SIZE,
+    class_mode = 'categorical')
+    
+# Recreate the exact same model, including its weights and the optimizer
+new_model = tf.keras.models.load_model('my_model.h5')
+
+# Show the model architecture
+new_model.summary()

@@ -29,7 +29,7 @@ STAT_PRECISION = 5
 HOUR = 3600 # secs
 TESTING_CHANNEL = 1119338645799841853
 GENERAL_CHANNEL = TESTING_CHANNEL # 1119338497128542380
-CHANNEL_NAME = 'test'
+CHANNEL_PREFIX = 'test'
 CATEGORY = 1119338497128542378
 
 # Neural Network Constants
@@ -51,7 +51,10 @@ DATA_FOLDERS = 10
 
 ### Setting Up Local Working Directories ###
 
-TIME_LABEL = 'GLOBAL DUMMY'
+TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
+                           time.localtime()) # unique label tied to date and time
+
+CHANNEL_NAME = f'{CHANNEL_PREFIX}-{TIME_LABEL}'
 
 paths = {
     'TRAIN_DATA_DIR' : os.path.join('data', 'train'),
@@ -66,7 +69,7 @@ def generate_dirs():
     global paths
     
     TIME_LABEL = time.strftime("%Y-%m-%d-%H%M%S",
-        time.localtime()) # unique label tied to date and time
+                               time.localtime()) # unique label tied to date and time
     
     paths['MODEL_DIR'] = os.path.join('models', f'outputs_{TIME_LABEL}')
     model_dir = paths['MODEL_DIR']
@@ -228,13 +231,15 @@ async def on_ready():
     await client.wait_until_ready()
 
     category = client.get_channel(CATEGORY)
+    guild = category.guild
+    await category.create_text_channel(CHANNEL_NAME)
+    output = discord.utils.get(guild.text_channels, name=CHANNEL_NAME)
     
-    general = client.get_channel(GENERAL_CHANNEL) # channel that will output
     start_str = f'***{BOT_NAME} online. Beginning neural network.***\n'
     start_str = start_str + f'Maximum Accuracy Threshold: **{MAX_ACC_THRESHOLD}**\n'
     start_str = start_str + f'Minimum Loss Threshold: **{MIN_LOSS_THRESHOLD}**\n'
     start_str = start_str + f'Program start time: {start_var}\n\n\n---'
-    await general.send(start_str)
+    await output.send(start_str)
 
     # bulk of program run
     min_loss_iter = 100.0 # Just an initializing dummy value
@@ -249,21 +254,9 @@ async def on_ready():
         current_var = time.ctime(iter_start)
         generate_dirs() # sets variables, generates directories
 
-        channel_str = f'{CHANNEL_NAME}-{TIME_LABEL}'
-        guild = general.guild
-
-        if not bool(discord.utils.get(guild.categories, name=CHANNEL_NAME)):
-            await guild.create_category(CHANNEL_NAME)
-        category = discord.utils.get(guild.categories, name=CHANNEL_NAME)
-        
-        await category.create_text_channel(channel_str)
-        output = discord.utils.get(guild.text_channels, name=channel_str)
-        
         iter_str = f'***Start of Iteration {counter}***\nStart time: {current_var}\n---'
         print(iter_str)
         await output.send(iter_str)
-        
-        
         
         # iteration run
         min_loss_iter, \

@@ -37,15 +37,16 @@ IMG_WIDTH = 100
 IMG_HEIGHT = 100
 NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
-EPOCHS = 100
+EPOCHS = 500
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 0.1
-MAX_ACC_THRESHOLD = 0.90
-PATIENCE = 100
+MIN_LOSS_THRESHOLD = 1.0 # set to 1.0 to run once
+MAX_ACC_THRESHOLD = 0.0# set to 0.0 to run once
+PATIENCE = 25
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
+START_EARLY_STOPPING = 50
 
 
 
@@ -146,7 +147,8 @@ def train_model(model):
         patience = PATIENCE,
         mode = 'auto',
         baseline = 1,
-        restore_best_weights = True)]
+        restore_best_weights = True,
+        start_from_epoch = START_EARLY_STOPPING)]
 
     history_1 = model.fit(
         train_generator,

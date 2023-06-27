@@ -17,6 +17,7 @@ if typing.TYPE_CHECKING:
 
 # Discord Libraries
 import os # allows program to read in discord bot token
+import sys # stops program if needed
 import discord # allows interface with discord bot api
 from dotenv import load_dotenv # loads in .env file
 import time # allows for timestamps and elapsed time
@@ -225,6 +226,9 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
     print(f'Start time: {start_var}')
     await client.wait_until_ready()
+
+    category = client.get_channel(CATEGORY)
+    
     general = client.get_channel(GENERAL_CHANNEL) # channel that will output
     start_str = f'***{BOT_NAME} online. Beginning neural network.***\n'
     start_str = start_str + f'Maximum Accuracy Threshold: **{MAX_ACC_THRESHOLD}**\n'
@@ -244,11 +248,14 @@ async def on_ready():
         iter_start = time.time()
         current_var = time.ctime(iter_start)
         generate_dirs() # sets variables, generates directories
-        
+
         channel_str = f'{CHANNEL_NAME}-{TIME_LABEL}'
         guild = general.guild
-        await guild.create_category(CHANNEL_NAME)
+
+        if not bool(discord.utils.get(guild.categories, name=CHANNEL_NAME)):
+            await guild.create_category(CHANNEL_NAME)
         category = discord.utils.get(guild.categories, name=CHANNEL_NAME)
+        
         await category.create_text_channel(channel_str)
         output = discord.utils.get(guild.text_channels, name=channel_str)
         

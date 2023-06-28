@@ -41,12 +41,12 @@ EPOCHS = 500
 BATCH_SIZE = 20
 MIN_LOSS_THRESHOLD = 100.0 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.0# set to 0.0 to run once
-PATIENCE = 25
+PATIENCE = 50
 MIN_DELTA = 0.01
-MONITOR = 'val_loss'
+MONITOR = 'val_accuracy'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 50
+START_EARLY_STOPPING = 75
 
 
 
@@ -300,6 +300,8 @@ async def on_ready():
     print(end_str)
     await output.send(end_str)
 
+    # exit statements
+    client.close()
     sys.exit(0)
 
 client.run(TOKEN) # connects bot to server

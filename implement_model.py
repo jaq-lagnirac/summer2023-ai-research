@@ -1,14 +1,13 @@
 # Justin Caringal
 # Tests HDF5 model generated from tensorflow
 
-import os, sys; sys
+import os
+import sys
 import argparse
 import logging
 
-import discord
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import tensorflow as tf
+import numpy as np
+import cv2
 
 import typing
 from tensorflow import keras as K
@@ -48,3 +47,21 @@ if args.verbose:
   l.setLevel(logging.DEBUG)
 
 debug('%s begin', SCRIPT_PATH)
+
+cap = cv2.VideoCapture(0)
+
+while True:
+    ret, frame = cap.read()
+    
+    cv2.imshow('frame', image)
+
+    if cv2.waitKey(1) == ord('q')
+        break
+
+# Stop filming
+cam.release()
+ 
+# Close down OpenCV
+cv.destroyAllWindows()
+
+debug('%s end', SCRIPT_PATH)

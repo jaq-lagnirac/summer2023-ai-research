@@ -71,3 +71,5 @@ model.summary()
 scores = model.evaluate(test_generator)
 for index, score in enumerate(scores):
   print(f'{model.metrics_names[index]}: {score}')
+
+debug('%s end', SCRIPT_PATH)

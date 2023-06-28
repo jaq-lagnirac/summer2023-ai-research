@@ -22,6 +22,10 @@ import discord # allows interface with discord bot api
 from dotenv import load_dotenv # loads in .env file
 import time # allows for timestamps and elapsed time
 
+# Command-Line Libraries
+import argparse
+import logging
+
 # Discord Constants
 BOT_NAME = 'Amara'
 TIME_PRECISION = 2
@@ -39,14 +43,57 @@ NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 500
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 100.0 # set to 100.0 to run once
-MAX_ACC_THRESHOLD = 0.0# set to 0.0 to run once
-PATIENCE = 25
+MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
+MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
+PATIENCE = 100
 MIN_DELTA = 0.01
-MONITOR = 'val_loss'
+MONITOR = 'val_accuracy'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 50
+START_EARLY_STOPPING = 100
+
+
+
+### Command Line
+
+SCRIPT_PATH = os.path.abspath(__file__)
+FORMAT = '[%(asctime)s] %(levelname)s %(message)s'
+l = logging.getLogger()
+lh = logging.StreamHandler()
+lh.setFormatter(logging.Formatter(FORMAT))
+l.addHandler(lh)
+l.setLevel(logging.INFO)
+debug = l.debug; info = l.info; warning = l.warning; error = l.error
+
+DESCRIPTION = '''
+'''
+
+EPILOG = '''
+'''
+
+class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
+    argparse.RawDescriptionHelpFormatter):
+  pass
+parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
+  formatter_class=CustomFormatter)
+
+parser.add_argument('-o','--once',
+                    action='store_true',
+                    help='Sets program to run once')
+parser.add_argument('-v', '--verbose',
+                    action='store_true',
+                    help='Set logging level to DEBUG')
+
+args = parser.parse_args()
+
+if args.verbose:
+    l.setLevel(logging.DEBUG)
+
+if args.once:
+    MIN_LOSS_THRESHOLD = 100.0
+    MAX_ACC_THRESHOLD = 0.0
+
+debug('%s begin', SCRIPT_PATH)
 
 
 
@@ -167,10 +214,12 @@ def save_model(model):
     # Output models
     json_output = os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
     hdf5_output = os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
+    pb_output = os.path.join(paths['MODEL_DIR'], f'pb_saved_model_{TIME_LABEL}')
     
     with open(json_output, 'w') as json_file:
         json_file.write(json_model)
     model.save(hdf5_output)
+    model.save(pb_output)
    
 def run_model():
     built_model = None
@@ -238,9 +287,12 @@ async def on_ready():
     output = discord.utils.get(guild.text_channels, name=CHANNEL_NAME)
     
     start_str = f'***{BOT_NAME} online. Beginning neural network.***\n'
-    start_str = start_str + f'Maximum Accuracy Threshold: **{MAX_ACC_THRESHOLD}**\n'
-    start_str = start_str + f'Minimum Loss Threshold: **{MIN_LOSS_THRESHOLD}**\n'
-    start_str = start_str + f'Program start time: {start_var}\n\n\n---'
+    if args.once:
+        start_str += f'Only running once.\n'
+    else:
+        start_str += f'Maximum Accuracy Threshold: **{MAX_ACC_THRESHOLD}**\n'
+        start_str += f'Minimum Loss Threshold: **{MIN_LOSS_THRESHOLD}**\n'
+    start_str += f'Program start time: {start_var}\n\n\n---'
     await output.send(start_str)
 
     # bulk of program run
@@ -281,6 +333,8 @@ async def on_ready():
         # file location
         model_dir = paths['MODEL_DIR']
 
+        min_loss_acc = round(min_loss_acc, STAT_PRECISION)
+
         # end of iteration
         iter_str = f'***End of Iteration {counter}***\nEnd time: {current_var}\n'
         iter_str += f'Iteration Elapsed: {num_epochs} epochs, {iter_elapsed} seconds\n'
@@ -294,12 +348,15 @@ async def on_ready():
     end = time.time()
     end_var = time.ctime(end)
     elapsed = round(end - start, TIME_PRECISION)
-    elapsed_hrs = elapsed / HOUR
+    elapsed_hrs = round((elapsed / HOUR), STAT_PRECISION)
     end_str = f'End of model generation, best model achieved.\nEnd time: {end_var}\n'
-    end_str = end_str + f'Program Elapsed: {elapsed} seconds ({elapsed_hrs} hours)'
+    end_str += f'Program Elapsed: {elapsed} seconds ({elapsed_hrs} hours)'
     print(end_str)
     await output.send(end_str)
 
+    # exit statements
+    await client.close()
+    debug('%s begin', SCRIPT_PATH)
     sys.exit(0)
 
 client.run(TOKEN) # connects bot to server

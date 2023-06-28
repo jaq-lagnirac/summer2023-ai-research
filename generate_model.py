@@ -281,6 +281,8 @@ async def on_ready():
         # file location
         model_dir = paths['MODEL_DIR']
 
+        min_loss_acc = round(min_loss_acc, STAT_PRECISION)
+
         # end of iteration
         iter_str = f'***End of Iteration {counter}***\nEnd time: {current_var}\n'
         iter_str += f'Iteration Elapsed: {num_epochs} epochs, {iter_elapsed} seconds\n'
@@ -294,7 +296,7 @@ async def on_ready():
     end = time.time()
     end_var = time.ctime(end)
     elapsed = round(end - start, TIME_PRECISION)
-    elapsed_hrs = elapsed / HOUR
+    elapsed_hrs = round((elapsed / HOUR), STAT_PRECISION)
     end_str = f'End of model generation, best model achieved.\nEnd time: {end_var}\n'
     end_str = end_str + f'Program Elapsed: {elapsed} seconds ({elapsed_hrs} hours)'
     print(end_str)

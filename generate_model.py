@@ -41,12 +41,12 @@ EPOCHS = 500
 BATCH_SIZE = 20
 MIN_LOSS_THRESHOLD = 100.0 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.0# set to 0.0 to run once
-PATIENCE = 50
+PATIENCE = 100
 MIN_DELTA = 0.01
 MONITOR = 'val_accuracy'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 75
+START_EARLY_STOPPING = 100
 
 
 
@@ -167,10 +167,12 @@ def save_model(model):
     # Output models
     json_output = os.path.join(paths['MODEL_DIR'], f'json_model_{TIME_LABEL}.json')
     hdf5_output = os.path.join(paths['MODEL_DIR'], f'saved_model_{TIME_LABEL}.h5')
+    pb_output = os.path.join(paths['MODEL_DIR'], f'pb_saved_model_{TIME_LABEL}')
     
     with open(json_output, 'w') as json_file:
         json_file.write(json_model)
     model.save(hdf5_output)
+    model.save(pb_output)
    
 def run_model():
     built_model = None
@@ -303,7 +305,7 @@ async def on_ready():
     await output.send(end_str)
 
     # exit statements
-    client.close()
+    await client.close()
     sys.exit(0)
 
 client.run(TOKEN) # connects bot to server

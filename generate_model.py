@@ -39,7 +39,7 @@ NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 500
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 1.0 # set to 1.0 to run once
+MIN_LOSS_THRESHOLD = 100.0 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.0# set to 0.0 to run once
 PATIENCE = 25
 MIN_DELTA = 0.01
@@ -300,11 +300,6 @@ async def on_ready():
     print(end_str)
     await output.send(end_str)
 
-    # hotfix to prevent model generation from running again
-    hours = 0
-    while True:
-        time.sleep(HOUR)
-        hours += 1
-        print(f'Program done for {hours} hour(s): {time.ctime()}')
+    sys.exit(0)
 
 client.run(TOKEN) # connects bot to server

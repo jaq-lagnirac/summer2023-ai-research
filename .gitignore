@@ -1,5 +1,5 @@
 .env
 Dataset/**
 Examples/**
-# models/** # Will remove in the future, but I don't want to save models as of right now
+models/** # Will remove in the future, but I don't want to save models as of right now
 NOTE_TO_SELF

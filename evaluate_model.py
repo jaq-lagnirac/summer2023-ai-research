@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 IMG_WIDTH = 100
 IMG_HEIGHT = 100
-BATCH_SIZE = 20 
+BATCH_SIZE = 5 
 
 SCRIPT_PATH = os.path.abspath(__file__)
 FORMAT = '[%(asctime)s] %(levelname)s %(message)s'
@@ -66,3 +66,8 @@ model = tf.keras.models.load_model(args.tensorflow_file)
 
 # Show the model architecture
 model.summary()
+
+# Evaluate inputted model
+scores = model.evaluate(test_generator)
+for index, score in enumerate(scores):
+  print(f'{model.metrics_names[index]}: {score}')

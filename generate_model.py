@@ -22,6 +22,10 @@ import discord # allows interface with discord bot api
 from dotenv import load_dotenv # loads in .env file
 import time # allows for timestamps and elapsed time
 
+# Command-Line Libraries
+import argparse
+import logging
+
 # Discord Constants
 BOT_NAME = 'Amara'
 TIME_PRECISION = 2
@@ -39,14 +43,54 @@ NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 500
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 100.0 # set to 100.0 to run once
-MAX_ACC_THRESHOLD = 0.0# set to 0.0 to run once
+MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
+MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
 PATIENCE = 100
 MIN_DELTA = 0.01
 MONITOR = 'val_accuracy'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 100
+
+
+
+### Command Line
+
+SCRIPT_PATH = os.path.abspath(__file__)
+FORMAT = '[%(asctime)s] %(levelname)s %(message)s'
+l = logging.getLogger()
+lh = logging.StreamHandler()
+lh.setFormatter(logging.Formatter(FORMAT))
+l.addHandler(lh)
+l.setLevel(logging.INFO)
+debug = l.debug; info = l.info; warning = l.warning; error = l.error
+
+DESCRIPTION = '''
+'''
+
+EPILOG = '''
+'''
+
+class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
+    argparse.RawDescriptionHelpFormatter):
+  pass
+parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
+  formatter_class=CustomFormatter)
+
+parser.add_argument('-o','--once', action='store_true')
+parser.add_argument('-v', '--verbose', action='store_true',
+    help='Set logging level to DEBUG')
+
+args = parser.parse_args()
+
+if args.verbose:
+    l.setLevel(logging.DEBUG)
+
+if args.once:
+    MIN_LOSS_THRESHOLD = 100.0
+    MAX_ACC_THRESHOLD = 0.0
+
+debug('%s begin', SCRIPT_PATH)
 
 
 

@@ -1,7 +1,8 @@
 # Justin Caringal
 # Tests HDF5 model generated from tensorflow
 
-import os, sys; sys
+import os
+import sys
 import argparse
 import logging
 

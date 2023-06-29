@@ -25,6 +25,7 @@ import time # allows for timestamps and elapsed time
 # Command-Line Libraries
 import argparse
 import logging
+import json
 
 # Discord Constants
 BOT_NAME = 'Amara'

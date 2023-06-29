@@ -7,7 +7,7 @@ import argparse
 import logging
 
 import numpy as np
-import cv2
+import cv2 as cv
 
 import typing
 from tensorflow import keras as K
@@ -37,9 +37,12 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
   formatter_class=CustomFormatter)
 
-parser.add_argument('input_files', nargs='+')
+parser.add_argument('--pb',
+                    help='Tensorflow Protobuff File')
+parser.add_argument('--pbtxt',
+                    help='Tensorflow Protobuff Text File')
 parser.add_argument('-v', '--verbose', action='store_true',
-    help='Set logging level to DEBUG')
+                    help='Set logging level to DEBUG')
 
 args = parser.parse_args()
 
@@ -48,14 +51,21 @@ if args.verbose:
 
 debug('%s begin', SCRIPT_PATH)
 
-cap = cv2.VideoCapture(0)
+cam = cv.VideoCapture(0)
+
+tensorflowNet = cv.dnn.readNetFromTensorflow(args.pb, args.pbtxt)
 
 while True:
-    ret, frame = cap.read()
-    
-    cv2.imshow('frame', image)
+    # Read in the frame
+    ret_val, img = cam.read()
+    rows = img.shape[0]
+    cols = img.shape[1]
+    tensorflowNet.setInput(cv.dnn.blobFromImage(img, size=(300, 300), swapRB=True, crop=False))
 
-    if cv2.waitKey(1) == ord('q')
+    # Display the frame
+    cv.imshow('my webcam', img)
+
+    if cv.waitKey(1) == ord('q'):
         break
 
 # Stop filming

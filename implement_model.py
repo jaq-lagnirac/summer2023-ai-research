@@ -55,7 +55,13 @@ if args.verbose:
 with open(args.config) as fh:
   config_json = json.loads(fh.read())
 
+DETECTION_THRESHHOLD = 0.3
+THICKNESS = 2
 
+classes = config_json['classes']
+
+# Colors for object labels
+colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
 debug('%s begin', SCRIPT_PATH)
 
@@ -69,6 +75,38 @@ while True:
     rows = img.shape[0]
     cols = img.shape[1]
     cvNet.setInput(cv.dnn.blobFromImage(img, size=(300, 300), swapRB=True, crop=False))
+
+    # Run object detection
+    cvOut = cvNet.forward()
+
+    # Go through each object detected and label it
+    for detection in cvOut[0, 0, : , : ]:
+       score = float(detection[2])
+       if score > DETECTION_THRESHHOLD:
+          index = int(detection[1]) # prediction class idx
+          
+          # detection box bounds
+          left = detection[3] * cols
+          top = detection[4] * rows
+          right = detection[5] * cols
+          bottom = detection[6] * rows
+
+          cv.rectangle(img,
+                       (int(left), int(top)),
+                       (int(right), int(bottom)),
+                       (23, 230, 210),
+                       thickness = THICKNESS)
+          
+          # draw prediction box on frame
+          label = "{}: {:.2f}%".format(classes[index],
+                                       score * 100)
+          y = top - 15 if top - 15 > 15 else top + 15
+          cv.putText(img,
+                     label,
+                     (int(left), int(y)),
+                     cv.FONT_HERSHEY_SIMPLEX,
+                     0.5,
+                     colors[index], 2)
 
     # Display the frame
     cv.imshow('my webcam', img)

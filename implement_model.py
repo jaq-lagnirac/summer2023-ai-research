@@ -5,6 +5,7 @@ import os
 import sys
 import argparse
 import logging
+import json
 
 import numpy as np
 import cv2 as cv
@@ -37,6 +38,8 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
   formatter_class=CustomFormatter)
 
+parser.add_argument('config',
+                    help='JSON config File')
 parser.add_argument('--pb',
                     help='Tensorflow Protobuff File')
 parser.add_argument('--pbtxt',
@@ -49,18 +52,23 @@ args = parser.parse_args()
 if args.verbose:
   l.setLevel(logging.DEBUG)
 
+with open(args.config) as fh:
+  config_json = json.loads(fh.read())
+
+
+
 debug('%s begin', SCRIPT_PATH)
 
 cam = cv.VideoCapture(0)
 
-tensorflowNet = cv.dnn.readNetFromTensorflow(args.pb, args.pbtxt)
+cvNet = cv.dnn.readNetFromTensorflow(args.pb, args.pbtxt)
 
 while True:
     # Read in the frame
     ret_val, img = cam.read()
     rows = img.shape[0]
     cols = img.shape[1]
-    tensorflowNet.setInput(cv.dnn.blobFromImage(img, size=(300, 300), swapRB=True, crop=False))
+    cvNet.setInput(cv.dnn.blobFromImage(img, size=(300, 300), swapRB=True, crop=False))
 
     # Display the frame
     cv.imshow('my webcam', img)

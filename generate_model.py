@@ -25,32 +25,7 @@ import time # allows for timestamps and elapsed time
 # Command-Line Libraries
 import argparse
 import logging
-
-# Discord Constants
-BOT_NAME = 'Amara'
-TIME_PRECISION = 2
-STAT_PRECISION = 5
-HOUR = 3600 # secs
-TESTING_CHANNEL = 1119338645799841853
-GENERAL_CHANNEL = TESTING_CHANNEL # 1119338497128542380
-CHANNEL_PREFIX = 'test'
-CATEGORY = 1119338497128542378
-
-# Neural Network Constants
-IMG_WIDTH = 100
-IMG_HEIGHT = 100
-NB_TRAIN_SAMPLES = 100
-NB_VALIDATION_SAMPLES = 30
-EPOCHS = 500
-BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
-MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
-PATIENCE = 100
-MIN_DELTA = 0.01
-MONITOR = 'val_accuracy'
-DROPOUT = 0.5
-DATA_FOLDERS = 10
-START_EARLY_STOPPING = 100
+import json
 
 
 
@@ -77,6 +52,7 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
   formatter_class=CustomFormatter)
 
+parser.add_argument('config')
 parser.add_argument('-o','--once',
                     action='store_true',
                     help='Sets program to run once')
@@ -89,11 +65,40 @@ args = parser.parse_args()
 if args.verbose:
     l.setLevel(logging.DEBUG)
 
+debug('%s begin', SCRIPT_PATH)
+
+with open(args.config) as fh:
+  config_json = json.loads(fh.read())
+
+# Discord Constants
+BOT_NAME = config_json['bot_name']
+TIME_PRECISION = 2
+STAT_PRECISION = 5
+HOUR = 3600 # secs
+TESTING_CHANNEL = 1119338645799841853
+GENERAL_CHANNEL = TESTING_CHANNEL # 1119338497128542380
+CHANNEL_PREFIX = 'test'
+CATEGORY = 1119338497128542378
+
+# Neural Network Constants
+IMG_WIDTH = config_json['img_width']
+IMG_HEIGHT = config_json['img_height']
+NB_TRAIN_SAMPLES = 100
+NB_VALIDATION_SAMPLES = 30
+EPOCHS = 500
+BATCH_SIZE = 20
+MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
+MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
+PATIENCE = 100
+MIN_DELTA = 0.01
+MONITOR = 'val_accuracy'
+DROPOUT = 0.5
+DATA_FOLDERS = 10
+START_EARLY_STOPPING = 100
+
 if args.once:
     MIN_LOSS_THRESHOLD = 100.0
     MAX_ACC_THRESHOLD = 0.0
-
-debug('%s begin', SCRIPT_PATH)
 
 
 

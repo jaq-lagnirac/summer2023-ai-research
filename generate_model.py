@@ -96,6 +96,7 @@ DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 100
 
+# Runs model only once if flag is set
 if args.once:
     MIN_LOSS_THRESHOLD = 100.0
     MAX_ACC_THRESHOLD = 0.0

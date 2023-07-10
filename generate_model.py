@@ -6,7 +6,7 @@ import gc
 from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Input, Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
 import tensorflow as tf
 
@@ -138,19 +138,27 @@ def generate_dirs():
 def build_model():
    
     if K.backend.image_data_format() == 'channels_first':
-        in_shape = (3, IMG_WIDTH, IMG_HEIGHT)
+        # in_shape = (3, IMG_WIDTH, IMG_HEIGHT)
+        in_shape = (3, None, None)
     else:
-        in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
+        # in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
+        in_shape = (None, None, 3)
        
     model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=in_shape))
+    model.add(Input(shape=in_shape))
+
+    model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
     
     model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
-   
+    
+    model.add(Conv2D(64, (3, 3)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size = (2, 2)))
+    
     model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))

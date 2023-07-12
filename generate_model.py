@@ -194,14 +194,14 @@ def train_model(model):
             class_mode = 'categorical')
     
     # Added Early Stopping
-    my_callback = [EarlyStopping(
+    early_stopping = EarlyStopping(
         monitor = MONITOR,
         min_delta = MIN_DELTA,
         patience = PATIENCE,
         mode = 'auto',
         baseline = 1,
         restore_best_weights = True,
-        start_from_epoch = START_EARLY_STOPPING)]
+        start_from_epoch = START_EARLY_STOPPING)
 
     history_1 = model.fit(
         train_generator,
@@ -209,7 +209,7 @@ def train_model(model):
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = my_callback)
+        callbacks = [early_stopping])
    
     return model, history_1
    

@@ -40,10 +40,10 @@ parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
 
 parser.add_argument('config',
                     help='JSON config File')
-parser.add_argument('pb',
-                    help='Tensorflow Protobuff File')
-#parser.add_argument('pbtxt',
-#                    help='Tensorflow Protobuff Text File')
+# parser.add_argument('pb',
+#                     help='Tensorflow Protobuff File')
+# parser.add_argument('pbtxt',
+#                     help='Tensorflow Protobuff Text File')
 parser.add_argument('-v', '--verbose', action='store_true',
                     help='Set logging level to DEBUG')
 
@@ -67,7 +67,9 @@ debug('%s begin', SCRIPT_PATH)
 
 cam = cv.VideoCapture(0)
 
-cvNet = cv.dnn.readNetFromTensorflow(args.pb)#, args.pbtxt)
+path = 'saved_models/outputs_2023-07-10-125728/saved_model_2023-07-10-125728.h5'
+
+cvNet = cv.dnn.readNetFromTensorflow(path)#args.pb, args.pbtxt)
 
 while True:
     # Read in the frame

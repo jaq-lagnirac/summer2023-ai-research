@@ -41,7 +41,7 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
   formatter_class=CustomFormatter)
 
-parser.add_argument('tensorflow_file')
+# parser.add_argument('tensorflow_file')
 parser.add_argument('-v', '--verbose', action='store_true',
     help='Set logging level to DEBUG')
 
@@ -62,8 +62,12 @@ test_generator = test_datagen.flow_from_directory(
     batch_size = BATCH_SIZE,
     class_mode = 'categorical')
     
+EXT = '2023-07-14-151927'
+model_path = os.path.join('saved_models',
+                          f'outputs_{EXT}',
+                          f'saved_model_{EXT}.h5')
 # Recreate the exact same model, including its weights and the optimizer
-model = tf.keras.models.load_model(args.tensorflow_file)
+model = tf.keras.models.load_model(model_path)#args.tensorflow_file)
 
 # Show the model architecture
 model.summary()

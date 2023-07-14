@@ -5,7 +5,7 @@
 import gc
 from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 import tensorflow as tf
@@ -87,8 +87,8 @@ NB_TRAIN_SAMPLES = 100
 NB_VALIDATION_SAMPLES = 30
 EPOCHS = 500
 BATCH_SIZE = 20
-MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
-MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
+MIN_LOSS_THRESHOLD = 0.45 # set to 100.0 to run once
+MAX_ACC_THRESHOLD = 0.85 # set to 0.0 to run once
 PATIENCE = 100
 MIN_DELTA = 0.01
 MONITOR = 'val_accuracy'
@@ -138,11 +138,13 @@ def generate_dirs():
 def build_model():
    
     if K.backend.image_data_format() == 'channels_first':
-        in_shape = (3, IMG_WIDTH, IMG_HEIGHT)
+        #in_shape = (3, IMG_WIDTH, IMG_HEIGHT)
+        in_shape (3, None, None)
     else:
-        in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
+        #in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
+        in_shape = (None, None, 3)
        
-    model = Sequential()
+    model = Model()
     model.add(Conv2D(32, (3, 3), input_shape=in_shape))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))

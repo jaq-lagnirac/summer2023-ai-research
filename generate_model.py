@@ -91,7 +91,7 @@ MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
 PATIENCE = 100
 MIN_DELTA = 0.01
-MONITOR = 'val_accuracy'
+MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 100
@@ -160,7 +160,7 @@ def build_model():
     model.add(Activation('relu'))
     model.add(Dropout(DROPOUT))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
-    model.add(Activation('sigmoid'))
+    model.add(Activation('softmax'))
    
     model.compile(loss = 'categorical_crossentropy',
                   optimizer = 'rmsprop',

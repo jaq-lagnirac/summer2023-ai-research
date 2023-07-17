@@ -61,6 +61,8 @@ test_generator = test_datagen.flow_from_directory(
     target_size = (IMG_WIDTH,IMG_HEIGHT),
     batch_size = BATCH_SIZE,
     class_mode = 'categorical')
+
+print(test_generator.class_indices)
     
 EXT = '2023-07-14-151927'
 model_path = os.path.join('saved_models',

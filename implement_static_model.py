@@ -10,6 +10,9 @@ from tensorflow.keras.preprocessing import image
 from keras.models import load_model
 import tensorflow as tf
 
+IMG_WIDTH = 100
+IMG_HEIGHT = 100
+BATCH_SIZE = 5 
 
 classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -32,7 +35,7 @@ real_results = {
     'IMG_1275.JPG' : 5,
     'IMG_1276.JPG' : 6,
     'IMG_1277.JPG' : 7,
-    'IMG_1278.JPG' : 8,
+    'IMG_1268.JPG' : 8,
     'IMG_1279.JPG' : 9,
     
 }
@@ -43,6 +46,19 @@ model_path = os.path.join('saved_models',
                           f'outputs_{EXT}',
                           f'saved_model_{EXT}.h5')
 dir_path = os.path.join('..', 'testing_data')
+test_data = os.path.join('data', 'test')
+
+test_datagen = image.ImageDataGenerator(rescale = 1./255)
+
+test_generator = test_datagen.flow_from_directory(
+    test_data,
+    target_size = (IMG_WIDTH,IMG_HEIGHT),
+    batch_size = BATCH_SIZE,
+    class_mode = 'categorical')
+
+index_dict = test_generator.class_indices
+
+print(index_dict)
 
 # load model from location
 model = load_model(model_path)
@@ -60,4 +76,4 @@ for img in os.listdir(dir_path):
     result_list = model.predict(test_image)
     # Generate arg maxes for predictions
     predicted_classes = np.argmax(result_list, axis = 1)
-    print(f'{real_results[img]} --- {predicted_classes}')
+    print(f'Actual: {real_results[img]} --- Predicted: {predicted_classes}')

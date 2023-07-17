@@ -15,4 +15,8 @@ Mavi, A., (2020), “A New Dataset and Proposed Convolutional Neural Network Arc
 
 Accessed from *https://www.kaggle.com/datasets/ayuraj/asl-dataset*.
 
+### Synthetic Numbers ASL Numbers by ***Lexset***
+
+Accessed from *https://www.kaggle.com/datasets/lexset/synthetic-asl-numbers*.
+
 <!-- Possible third dataset at https://www.kaggle.com/datasets/rayeed045/american-sign-language-digit-dataset -->

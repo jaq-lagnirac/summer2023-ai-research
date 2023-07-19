@@ -1,3 +1,2 @@
 .env
-models/outputs_* # Will remove in the future, but I don't want to save models as of right now
-LIST-OF-DATASETS
+models/** # Will remove in the future, but I don't want to save models as of right now

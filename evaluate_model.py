@@ -16,9 +16,9 @@ from tensorflow import keras as K
 if typing.TYPE_CHECKING:
     from keras.api._v2 import keras
 
-IMG_WIDTH = 100
-IMG_HEIGHT = 100
-BATCH_SIZE = 5 
+IMG_WIDTH = 512
+IMG_HEIGHT = 512
+BATCH_SIZE = 25 
 
 SCRIPT_PATH = os.path.abspath(__file__)
 FORMAT = '[%(asctime)s] %(levelname)s %(message)s'
@@ -63,8 +63,12 @@ test_generator = test_datagen.flow_from_directory(
     class_mode = 'categorical')
 
 print(test_generator.class_indices)
-    
-EXT = '2023-07-14-151927'
+
+# EXT = '2023-07-20-102559'
+# EXT = '2023-07-19-150939'  
+# EXT = '2023-07-20-131026'
+# EXT = '2023-07-20-160251'
+EXT = '2023-07-20-182234'
 model_path = os.path.join('saved_models',
                           f'outputs_{EXT}',
                           f'saved_model_{EXT}.h5')

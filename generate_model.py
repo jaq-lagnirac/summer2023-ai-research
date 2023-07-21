@@ -7,7 +7,7 @@ from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping
 import tensorflow as tf
 
 import typing
@@ -52,7 +52,7 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
   formatter_class=CustomFormatter)
 
-parser.add_argument('config')
+#parser.add_argument('config')
 parser.add_argument('-o','--once',
                     action='store_true',
                     help='Sets program to run once')
@@ -67,7 +67,8 @@ if args.verbose:
 
 debug('%s begin', SCRIPT_PATH)
 
-with open(args.config) as fh:
+#with open(args.config) as fh:
+with open('config.json') as fh:
   config_json = json.loads(fh.read())
 
 # Discord Constants
@@ -83,21 +84,22 @@ CATEGORY = 1119338497128542378
 # Neural Network Constants
 IMG_WIDTH = config_json['img_width']
 IMG_HEIGHT = config_json['img_height']
-NB_TRAIN_SAMPLES = 100
-NB_VALIDATION_SAMPLES = 30
+NB_TRAIN_SAMPLES = 200
+NB_VALIDATION_SAMPLES = 50
 EPOCHS = 500
-BATCH_SIZE = 20
+BATCH_SIZE = 50
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
-PATIENCE = 100
+PATIENCE = 50
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 100
+START_EARLY_STOPPING = 200
 
 # Runs model only once if flag is set
-if args.once:
+#if args.once:
+if True:
     MIN_LOSS_THRESHOLD = 100.0
     MAX_ACC_THRESHOLD = 0.0
 
@@ -146,10 +148,14 @@ def build_model():
     model.add(Conv2D(32, (3, 3), input_shape=in_shape))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
+
+    model.add(Dropout(0.1))
     
     model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
+
+    model.add(Dropout(0.1))
    
     model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
@@ -160,7 +166,7 @@ def build_model():
     model.add(Activation('relu'))
     model.add(Dropout(DROPOUT))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
-    model.add(Activation('softmax'))
+    model.add(Activation('sigmoid'))
    
     model.compile(loss = 'categorical_crossentropy',
                   optimizer = 'rmsprop',
@@ -193,26 +199,15 @@ def train_model(model):
             batch_size = BATCH_SIZE,
             class_mode = 'categorical')
     
-    # Added Model Checkpoint
-    model_checkpoint = ModelCheckpoint(
-        filepath = f'checkpoints/checkpoint{TIME_LABEL}',
-        monitor = MONITOR,
-        save_best_only = True,
-        save_weights_only = True,
-        mode = 'auto',
-        save_freq = 'epoch'
-    )
-    
     # Added Early Stopping
-    early_stopping = EarlyStopping(
+    my_callback = [EarlyStopping(
         monitor = MONITOR,
         min_delta = MIN_DELTA,
         patience = PATIENCE,
         mode = 'auto',
         baseline = 1,
         restore_best_weights = True,
-        start_from_epoch = START_EARLY_STOPPING
-    )
+        start_from_epoch = START_EARLY_STOPPING)]
 
     history_1 = model.fit(
         train_generator,
@@ -220,8 +215,7 @@ def train_model(model):
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = [model_checkpoint,
-                     early_stopping])
+        callbacks = my_callback)
    
     return model, history_1
    

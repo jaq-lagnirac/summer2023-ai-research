@@ -1,6 +1,6 @@
 {
     "bot_name" : "Amara",
-    "img_height" : 400,
-    "img_width" : 400,
+    "img_height" : 512,
+    "img_width" : 512,
     "classes" : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 }

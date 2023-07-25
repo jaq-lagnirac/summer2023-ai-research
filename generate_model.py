@@ -52,7 +52,7 @@ class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
 parser = argparse.ArgumentParser(description=DESCRIPTION, epilog=EPILOG,
   formatter_class=CustomFormatter)
 
-parser.add_argument('config')
+#parser.add_argument('config')
 parser.add_argument('-o','--once',
                     action='store_true',
                     help='Sets program to run once')
@@ -67,7 +67,8 @@ if args.verbose:
 
 debug('%s begin', SCRIPT_PATH)
 
-with open(args.config) as fh:
+#with open(args.config) as fh:
+with open('config.json') as fh:
   config_json = json.loads(fh.read())
 
 # Discord Constants
@@ -83,21 +84,22 @@ CATEGORY = 1119338497128542378
 # Neural Network Constants
 IMG_WIDTH = config_json['img_width']
 IMG_HEIGHT = config_json['img_height']
-NB_TRAIN_SAMPLES = 100
-NB_VALIDATION_SAMPLES = 30
+NB_TRAIN_SAMPLES = 200
+NB_VALIDATION_SAMPLES = 50
 EPOCHS = 500
-BATCH_SIZE = 20
+BATCH_SIZE = 50
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
-PATIENCE = 100
+PATIENCE = 50
 MIN_DELTA = 0.01
-MONITOR = 'val_accuracy'
+MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 100
+START_EARLY_STOPPING = 200
 
 # Runs model only once if flag is set
-if args.once:
+#if args.once:
+if True:
     MIN_LOSS_THRESHOLD = 100.0
     MAX_ACC_THRESHOLD = 0.0
 
@@ -146,10 +148,14 @@ def build_model():
     model.add(Conv2D(32, (3, 3), input_shape=in_shape))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
+
+    model.add(Dropout(0.1))
     
     model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
+
+    model.add(Dropout(0.1))
    
     model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
@@ -259,7 +265,8 @@ def run_model():
       num_epochs, \
       min_loss_epoch, \
       max_acc_epoch, \
-      min_loss_acc
+      min_loss_acc, \
+      trained_model
 
 
 
@@ -324,7 +331,8 @@ async def on_ready():
             num_epochs, \
             min_loss_epoch, \
             max_acc_epoch, \
-            min_loss_acc \
+            min_loss_acc, \
+            model \
             = run_model() # runs model, stores variables
 
         # rounds numbers
@@ -359,6 +367,23 @@ async def on_ready():
     end_str += f'Program Elapsed: {elapsed} seconds ({elapsed_hrs} hours)'
     print(end_str)
     await output.send(end_str)
+
+    test_data = os.path.join('data', 'test')
+
+    test_datagen = ImageDataGenerator(rescale = 1./255)
+
+    test_generator = test_datagen.flow_from_directory(
+        test_data,
+        target_size = (IMG_WIDTH,IMG_HEIGHT),
+        batch_size = BATCH_SIZE,
+        class_mode = 'categorical')
+
+    # Evaluate inputted model
+    scores = model.evaluate(test_generator)
+    for index, score in enumerate(scores):
+      test_str = f'Test {model.metrics_names[index]}: {score}'
+      print(test_str)
+      await output.send(test_str)
 
     # exit statements
     await client.close()

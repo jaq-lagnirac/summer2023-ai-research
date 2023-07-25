@@ -25,7 +25,7 @@ while True:
     ret, frame = cap.read()
 
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 3)
     for(x, y, w, h) in faces:
         cv.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 5)
         roi_gray = gray[y:y+h, x:x+w]

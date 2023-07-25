@@ -145,7 +145,7 @@ def build_model():
         in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
        
     model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=in_shape))
+    model.add(Conv2D(128, (3, 3), input_shape=in_shape))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
 

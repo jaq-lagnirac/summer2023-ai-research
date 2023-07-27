@@ -6,7 +6,7 @@ import gc
 from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, GlobalAveragePooling2D
 from tensorflow.keras.callbacks import EarlyStopping
 import tensorflow as tf
 
@@ -86,7 +86,7 @@ IMG_WIDTH = config_json['img_width']
 IMG_HEIGHT = config_json['img_height']
 NB_TRAIN_SAMPLES = 200
 NB_VALIDATION_SAMPLES = 50
-EPOCHS = 500
+EPOCHS = 100
 BATCH_SIZE = 50
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
@@ -143,28 +143,22 @@ def build_model():
         in_shape = (3, IMG_WIDTH, IMG_HEIGHT)
     else:
         in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
-       
-    model = Sequential()
-    model.add(Conv2D(64, (3, 3), input_shape=in_shape))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
 
-    model.add(Dropout(0.1))
+    # Create the base model from the pre-trained model MobileNet V2
+    base_model = tf.keras.applications.MobileNetV2(input_shape=in_shape,
+                                                   include_top=False,
+                                                   weights='imagenet')
+    base_model.trainable = False
+
+    print(f'Number of layers in the base model: {len(base_model.layers)}')
     
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
+    model = Sequential()
+
+    model.add(base_model)
+
+    model.add(GlobalAveragePooling2D)
 
     model.add(Dropout(0.1))
-   
-    model.add(Conv2D(16, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-   
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(DROPOUT))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
     model.add(Activation('sigmoid'))
    

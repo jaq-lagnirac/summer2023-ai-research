@@ -155,7 +155,7 @@ def build_model():
     base_model.trainable = True
 
     # Freeze all the layers before the `fine_tune_at` layer
-    for layer in base_model.layers[:fine_tune_at]:
+    for layer in base_model.layers[:FINE_TUNE_POINT]:
       layer.trainable =  False
 
     info(f'Number of layers in the base model: {len(base_model.layers)}')

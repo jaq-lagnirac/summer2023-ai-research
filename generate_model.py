@@ -82,8 +82,8 @@ CHANNEL_PREFIX = 'test'
 CATEGORY = 1119338497128542378
 
 # Neural Network Constants
-IMG_WIDTH = config_json['img_width']
-IMG_HEIGHT = config_json['img_height']
+IMG_WIDTH = 224 #config_json['img_width']
+IMG_HEIGHT = 224#config_json['img_height']
 NB_TRAIN_SAMPLES = 150
 NB_VALIDATION_SAMPLES = 50
 EPOCHS = 500
@@ -144,7 +144,7 @@ def build_model():
     else:
         in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
 
-    in_shape = (512, 512, 3)
+    #in_shape = (512, 512, 3)
     # Create the base model from the pre-trained model MobileNet V2
     base_model = tf.keras.applications.MobileNetV2(input_shape=in_shape,
                                                    include_top=False,

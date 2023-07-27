@@ -143,21 +143,22 @@ def build_model():
         in_shape = (3, IMG_WIDTH, IMG_HEIGHT)
     else:
         in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
-       
+
+    base_model = tf
     model = Sequential()
-    model.add(Conv2D(64, (3, 3), input_shape=in_shape))
+    model.add(Conv2D(32, (3, 3), input_shape=in_shape))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
 
     model.add(Dropout(0.1))
     
-    model.add(Conv2D(32, (3, 3)))
+    model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
 
     model.add(Dropout(0.1))
    
-    model.add(Conv2D(16, (3, 3)))
+    model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size = (2, 2)))
    

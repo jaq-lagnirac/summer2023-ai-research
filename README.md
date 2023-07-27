@@ -1,6 +1,12 @@
 # summer2023-ai-research
 Research into artificial intelligence conducted in summer of 2023 under a Truman State University Department of Computer Science grant under the guidance of Dr. Ruthie Halma.
 
+General work conducted locally on Ubuntu distro through WSL2 (Windows 11).
+
+GUI-related OpenCV implementation conducted locally using Spyder Anaconda (Windows 11).
+
+Model generation and heavy computing conducted virtually on sand virtual machine, Truman State University (*https://sand.truman.edu/*).
+
 ## ASL Numbers Superset
 
 ### Sign Language Digits Dataset by ***[Turkey Ankara Ayrancı Anadolu High School](http://ayrancianadolu.meb.k12.tr)*** Students

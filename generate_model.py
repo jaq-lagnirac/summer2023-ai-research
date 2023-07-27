@@ -90,12 +90,12 @@ EPOCHS = 500
 BATCH_SIZE = 50
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
-PATIENCE = 50
+PATIENCE = 25
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 200
+START_EARLY_STOPPING = 150
 
 # Runs model only once if flag is set
 #if args.once:

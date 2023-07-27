@@ -95,7 +95,7 @@ MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 300
+START_EARLY_STOPPING = 250
 
 # Runs model only once if flag is set
 #if args.once:

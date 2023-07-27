@@ -144,6 +144,7 @@ def build_model():
     else:
         in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
 
+    in_shape = (512, 512, 3)
     # Create the base model from the pre-trained model MobileNet V2
     base_model = tf.keras.applications.MobileNetV2(input_shape=in_shape,
                                                    include_top=False,

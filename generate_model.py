@@ -96,6 +96,9 @@ MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 250
+FINE_TUNE_POINT = 100 # fine-tune after inputted layer
+# NOTE: MobileNetv2 has 154 as of writing,
+# set FINE_TUNE_POINT to 154 to freeze entire base_model
 
 # Runs model only once if flag is set
 #if args.once:
@@ -149,9 +152,13 @@ def build_model():
     base_model = tf.keras.applications.MobileNetV2(input_shape=in_shape,
                                                    include_top=False,
                                                    weights='imagenet')
-    base_model.trainable = False
+    base_model.trainable = True
 
-    print(f'Number of layers in the base model: {len(base_model.layers)}')
+    # Freeze all the layers before the `fine_tune_at` layer
+    for layer in base_model.layers[:fine_tune_at]:
+      layer.trainable =  False
+
+    info(f'Number of layers in the base model: {len(base_model.layers)}')
     
     model = Sequential()
 

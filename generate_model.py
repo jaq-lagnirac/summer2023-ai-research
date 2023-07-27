@@ -156,7 +156,7 @@ def build_model():
 
     model.add(base_model)
 
-    model.add(GlobalAveragePooling2D)
+    model.add(GlobalAveragePooling2D())
 
     model.add(Dropout(0.1))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders

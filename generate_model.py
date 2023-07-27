@@ -87,7 +87,7 @@ IMG_HEIGHT = 224#config_json['img_height']
 NB_TRAIN_SAMPLES = 150
 NB_VALIDATION_SAMPLES = 50
 EPOCHS = 500
-BATCH_SIZE = 50
+BATCH_SIZE = 25
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
 PATIENCE = 25
@@ -95,7 +95,7 @@ MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 150
+START_EARLY_STOPPING = 100
 
 # Runs model only once if flag is set
 #if args.once:

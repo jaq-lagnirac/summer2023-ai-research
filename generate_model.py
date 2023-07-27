@@ -84,18 +84,18 @@ CATEGORY = 1119338497128542378
 # Neural Network Constants
 IMG_WIDTH = config_json['img_width']
 IMG_HEIGHT = config_json['img_height']
-NB_TRAIN_SAMPLES = 200
+NB_TRAIN_SAMPLES = 150
 NB_VALIDATION_SAMPLES = 50
 EPOCHS = 500
 BATCH_SIZE = 50
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
-PATIENCE = 50
+PATIENCE = 25
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 200
+START_EARLY_STOPPING = 150
 
 # Runs model only once if flag is set
 #if args.once:
@@ -158,7 +158,7 @@ def build_model():
 
     model.add(GlobalAveragePooling2D())
 
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.25))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
     model.add(Activation('sigmoid'))
    

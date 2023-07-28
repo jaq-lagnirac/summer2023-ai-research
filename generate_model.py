@@ -7,7 +7,7 @@ from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, GlobalAveragePooling2D
-from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler
+from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler, TensorBoard
 import tensorflow as tf
 
 import typing
@@ -218,7 +218,13 @@ def train_model(model):
     # Added Learning Rate Scheduler
     lrs = LearningRateScheduler(scheduler)
 
-    callbacks = [es, csvl, lrs]
+    # Added Tensor Board
+    tb_path = os.path.join(paths['MODEL_DIR'], 'tensorboard_logs')
+    os.mkdir(tb_path)
+    tb = Tensorboard(tb_path)
+
+    # Callbacks list
+    callbacks = [es, csvl, lrs, tb]
 
     history_1 = model.fit(
         train_generator,

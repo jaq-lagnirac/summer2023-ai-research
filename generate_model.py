@@ -96,9 +96,9 @@ MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 250
-FINE_TUNE_POINT = 150 # fine-tune after inputted layer
-# NOTE: MobileNetv2 has 154 as of writing,
-# set FINE_TUNE_POINT to 154 to freeze entire base_model
+FINE_TUNE_POINT = 99999 # fine-tune after inputted layer
+# NOTE: MobileNetv2 has 154 as of writing,set
+# FINE_TUNE_POINT above 154 to freeze entire base_model
 
 # Runs model only once if flag is set
 #if args.once:

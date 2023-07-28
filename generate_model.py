@@ -7,7 +7,7 @@ from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, GlobalAveragePooling2D
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler, TensorBoard
 import tensorflow as tf
 
 import typing
@@ -99,6 +99,7 @@ START_EARLY_STOPPING = 250
 FINE_TUNE_POINT = 99999 # fine-tune after inputted layer
 # NOTE: MobileNetv2 has 154 as of writing,set
 # FINE_TUNE_POINT above 154 to freeze entire base_model
+START_SCHEDULER = 200 # starts decreasing learning rate after set epoch
 
 # Runs model only once if flag is set
 #if args.once:
@@ -175,6 +176,12 @@ def build_model():
                   metrics = ['accuracy'])
     return model
 
+def scheduler(epoch, lr):
+    if epoch > START_SCHEDULER: # if after epoch given
+        return (lr * tf.math.exp(-0.1))
+    else: # for first X epochs
+        return lr
+
 
 def train_model(model):
     # Augmentation configuration for training
@@ -202,14 +209,29 @@ def train_model(model):
             class_mode = 'categorical')
     
     # Added Early Stopping
-    my_callback = [EarlyStopping(
+    es = EarlyStopping(
         monitor = MONITOR,
         min_delta = MIN_DELTA,
         patience = PATIENCE,
         mode = 'auto',
         baseline = 1,
         restore_best_weights = True,
-        start_from_epoch = START_EARLY_STOPPING)]
+        start_from_epoch = START_EARLY_STOPPING)
+
+    # Added CSV Logger
+    log_path = os.path.join(paths['MODEL_DIR'], f'table_{TIME_LABEL}.csv')
+    csvl = CSVLogger(log_path)
+
+    # Added Learning Rate Scheduler
+    lrs = LearningRateScheduler(scheduler)
+
+    # Added Tensor Board
+    tb_path = os.path.join(paths['MODEL_DIR'], 'tensorboard_logs')
+    os.mkdir(tb_path)
+    tb = TensorBoard(tb_path)
+
+    # Callbacks list
+    callbacks = [es, csvl, lrs, tb]
 
     history_1 = model.fit(
         train_generator,
@@ -217,7 +239,7 @@ def train_model(model):
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = my_callback)
+        callbacks = callbacks)
    
     return model, history_1
    

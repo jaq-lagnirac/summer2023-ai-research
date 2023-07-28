@@ -90,16 +90,15 @@ EPOCHS = 1000
 BATCH_SIZE = 25
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
-PATIENCE = 150
+PATIENCE = 25
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
-DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 80
 FINE_TUNE_POINT = 99999 # fine-tune after inputted layer
 # NOTE: MobileNetv2 has 154 as of writing,set
 # FINE_TUNE_POINT above 154 to freeze entire base_model
-START_SCHEDULER = 50 # starts decreasing learning rate after set epoch
+START_SCHEDULER = 99999 # starts decreasing learning rate after set epoch
 
 # Runs model only once if flag is set
 #if args.once:

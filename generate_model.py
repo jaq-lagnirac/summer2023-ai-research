@@ -221,7 +221,7 @@ def train_model(model):
     # Added Tensor Board
     tb_path = os.path.join(paths['MODEL_DIR'], 'tensorboard_logs')
     os.mkdir(tb_path)
-    tb = Tensorboard(tb_path)
+    tb = TensorBoard(tb_path)
 
     # Callbacks list
     callbacks = [es, csvl, lrs, tb]

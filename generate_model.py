@@ -171,7 +171,7 @@ def build_model():
 
 def scheduler(epoch, lr):
     if epoch > START_SCHEDULER: # if after epoch given
-        return (lr ** -0.1)
+        return (lr * tf.math.exp(-0.1))
     else: # for first X epochs
         return lr
 

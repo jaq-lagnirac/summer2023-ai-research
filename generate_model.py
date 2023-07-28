@@ -7,7 +7,7 @@ from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 import tensorflow as tf
 
 import typing
@@ -199,15 +199,26 @@ def train_model(model):
             batch_size = BATCH_SIZE,
             class_mode = 'categorical')
     
+    # Added Model Checkpoint
+    model_checkpoint = ModelCheckpoint(
+        filepath = f'checkpoints/checkpoint{TIME_LABEL}',
+        monitor = MONITOR,
+        save_best_only = True,
+        save_weights_only = True,
+        mode = 'auto',
+        save_freq = 'epoch'
+    )
+    
     # Added Early Stopping
-    my_callback = [EarlyStopping(
+    early_stopping = EarlyStopping(
         monitor = MONITOR,
         min_delta = MIN_DELTA,
         patience = PATIENCE,
         mode = 'auto',
         baseline = 1,
         restore_best_weights = True,
-        start_from_epoch = START_EARLY_STOPPING)]
+        start_from_epoch = START_EARLY_STOPPING
+    )
 
     history_1 = model.fit(
         train_generator,
@@ -215,7 +226,8 @@ def train_model(model):
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = my_callback)
+        callbacks = [model_checkpoint,
+                     early_stopping])
    
     return model, history_1
    

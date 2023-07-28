@@ -99,7 +99,7 @@ START_EARLY_STOPPING = 80
 FINE_TUNE_POINT = 99999 # fine-tune after inputted layer
 # NOTE: MobileNetv2 has 154 as of writing,set
 # FINE_TUNE_POINT above 154 to freeze entire base_model
-START_SCHEDULER = 200 # starts decreasing learning rate after set epoch
+START_SCHEDULER = EPOCHS # starts decreasing learning rate after set epoch
 
 # Runs model only once if flag is set
 #if args.once:

@@ -7,7 +7,7 @@ from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, GlobalAveragePooling2D
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler
 import tensorflow as tf
 
 import typing
@@ -96,6 +96,7 @@ MONITOR = 'val_loss'
 DROPOUT = 0.5
 DATA_FOLDERS = 10
 START_EARLY_STOPPING = 250
+START_SCHEDULER = 25 # starts decreasing learning rate after set epoch
 
 # Runs model only once if flag is set
 #if args.once:
@@ -168,6 +169,12 @@ def build_model():
                   metrics = ['accuracy'])
     return model
 
+def scheduler(epoch, lr):
+    if epoch > START_SCHEDULER: # if after epoch given
+        return (lr ** -0.1)
+    else: # for first X epochs
+        return lr
+
 
 def train_model(model):
     # Augmentation configuration for training
@@ -195,7 +202,7 @@ def train_model(model):
             class_mode = 'categorical')
     
     # Added Early Stopping
-    early_stopping = EarlyStopping(
+    es = EarlyStopping(
         monitor = MONITOR,
         min_delta = MIN_DELTA,
         patience = PATIENCE,
@@ -204,13 +211,20 @@ def train_model(model):
         restore_best_weights = True,
         start_from_epoch = START_EARLY_STOPPING)
 
+    # Added CSV Logger
+    log_path = os.path.join(paths['MODEL_DIR'], f'table_{TIME_LABEL}.csv')
+    csvl = CSVLogger(log_path)
+
+    # Added Learning Rate Scheduler
+    lrs = LearningRateScheduler(scheduler)
+
     history_1 = model.fit(
         train_generator,
         steps_per_epoch = NB_TRAIN_SAMPLES // BATCH_SIZE,
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = [early_stopping])
+        callbacks = [es, csvl, lrs])
    
     return model, history_1
    

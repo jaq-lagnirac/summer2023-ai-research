@@ -218,13 +218,15 @@ def train_model(model):
     # Added Learning Rate Scheduler
     lrs = LearningRateScheduler(scheduler)
 
+    callbacks = [es, csvl, lrs]
+
     history_1 = model.fit(
         train_generator,
         steps_per_epoch = NB_TRAIN_SAMPLES // BATCH_SIZE,
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = [es, csvl, lrs])
+        callbacks = callbacks)
    
     return model, history_1
    

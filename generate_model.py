@@ -167,7 +167,7 @@ def build_model():
 
     model.add(GlobalAveragePooling2D())
 
-    model.add(Dropout(0.25))
+    #model.add(Dropout(0.25))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
     model.add(Activation('sigmoid'))
    

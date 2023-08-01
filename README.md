@@ -14,6 +14,7 @@ Data available on linked Discord server *https://discord.gg/D2JC36t7QE*.
 <p align="center">
     <img src="FINAL/discord-qr.png" width="200" alt="Discord QR Code">
 </p>
+
 ## ASL Numbers Superset
 
 ### Sign Language Digits Dataset by ***[Turkey Ankara Ayrancı Anadolu High School](http://ayrancianadolu.meb.k12.tr)*** Students

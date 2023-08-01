@@ -1,5 +1,7 @@
 # summer2023-ai-research
-Research into artificial intelligence conducted in summer of 2023 under a Truman State University Department of Computer Science grant under the guidance of Dr. Ruthie Halma.
+Research into artificial intelligence conducted in summer of 2023 (May to August, 2023) under a Truman State University Department of Computer Science grant under the guidance of Dr. Ruthie Halma.
+
+This repository has not been cleaned up and is still considered a work-in-progress.
 
 ## ASL Numbers Superset
 
@@ -19,4 +21,4 @@ Accessed from *https://www.kaggle.com/datasets/ayuraj/asl-dataset*.
 
 Accessed from *https://www.kaggle.com/datasets/lexset/synthetic-asl-numbers*.
 
-<!-- Possible third dataset at https://www.kaggle.com/datasets/rayeed045/american-sign-language-digit-dataset -->
+<!-- Possible fourth dataset at https://www.kaggle.com/datasets/rayeed045/american-sign-language-digit-dataset -->

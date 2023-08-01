@@ -5,9 +5,9 @@
 import gc
 from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential 
 from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, GlobalAveragePooling2D
-from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler, TensorBoard
+from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler, TensorBoard, ModelCheckpoint
 import tensorflow as tf
 
 import typing
@@ -213,6 +213,16 @@ def train_model(model):
             batch_size = BATCH_SIZE,
             class_mode = 'categorical')
     
+    # Added Model Checkpoint
+    mc = ModelCheckpoint(
+        filepath = f'checkpoints/checkpoint{TIME_LABEL}',
+        monitor = MONITOR,
+        save_best_only = True,
+        save_weights_only = True,
+        mode = 'auto',
+        save_freq = 'epoch'
+    )
+    
     # Added Early Stopping
     es = EarlyStopping(
         monitor = MONITOR,
@@ -236,7 +246,7 @@ def train_model(model):
     tb = TensorBoard(tb_path)
 
     # Callbacks list
-    callbacks = [es, csvl, lrs, tb]
+    callbacks = [mc, es, csvl, lrs, tb]
 
     history_1 = model.fit(
         train_generator,

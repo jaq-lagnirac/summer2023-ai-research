@@ -62,7 +62,6 @@ checkpoint_dir = os.path.dirname(checkpoint_path)
 model = models.load_model('saved_models/outputs_2023-07-12-123433/saved_model_2023-07-12-123433.h5')
 model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
 video = cv2.VideoCapture(0)
->>>>>>> static-implementation-dev
 
 while True:
         _, frame = video.read()

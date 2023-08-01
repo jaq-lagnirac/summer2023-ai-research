@@ -39,13 +39,15 @@ Accessed from *https://www.kaggle.com/datasets/lexset/synthetic-asl-numbers*.
 
 [Keras API reference](https://keras.io/api/)
 
+[Tensorflow Model Zoo](https://www.tensorflow.org/api_docs/python/tf/keras/applications)
+
 [OpenCV-Python Tutorials](https://docs.opencv.org/3.4/d6/d00/tutorial_py_root.html)
 
 [RoboFlow - How to Train MobileNetV2 On a Custom Dataset](https://blog.roboflow.com/how-to-train-mobilenetv2-on-a-custom-dataset/)
 
 [StackOverflow - tensorboard: command not found](https://stackoverflow.com/a/47715665)
 
-For more information, please see attached paper (TBA).
+For more information, please see attached paper in `FINAL/`.
 
 ## Future Directions Resources
 

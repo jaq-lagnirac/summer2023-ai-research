@@ -6,8 +6,8 @@ import gc
 from tkinter import ROUND
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropout, GlobalAveragePooling2D
+from tensorflow.keras.callbacks import EarlyStopping, CSVLogger, LearningRateScheduler, TensorBoard
 import tensorflow as tf
 
 import typing
@@ -82,20 +82,24 @@ CHANNEL_PREFIX = 'test'
 CATEGORY = 1119338497128542378
 
 # Neural Network Constants
-IMG_WIDTH = config_json['img_width']
-IMG_HEIGHT = config_json['img_height']
-NB_TRAIN_SAMPLES = 200
+IMG_WIDTH = 224 #config_json['img_width']
+IMG_HEIGHT = 224#config_json['img_height']
+NB_TRAIN_SAMPLES = 150
 NB_VALIDATION_SAMPLES = 50
-EPOCHS = 500
-BATCH_SIZE = 50
+EPOCHS = 1000
+BATCH_SIZE = 25
 MIN_LOSS_THRESHOLD = 0.10 # set to 100.0 to run once
 MAX_ACC_THRESHOLD = 0.90 # set to 0.0 to run once
 PATIENCE = 25
 MIN_DELTA = 0.01
 MONITOR = 'val_loss'
-DROPOUT = 0.5
 DATA_FOLDERS = 10
-START_EARLY_STOPPING = 150
+START_EARLY_STOPPING = 250
+FINE_TUNE_POINT = 99999 # fine-tune after inputted layer
+# NOTE: MobileNetv2 has 154 as of writing,set
+# FINE_TUNE_POINT above 154 to freeze entire base_model
+LEARNING_RATE = 0.001
+START_SCHEDULER = 99999 # starts decreasing learning rate after set epoch
 
 # Runs model only once if flag is set
 #if args.once:
@@ -144,28 +148,26 @@ def build_model():
     else:
         in_shape = (IMG_WIDTH, IMG_HEIGHT, 3)
 
-    base_model = tf
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=in_shape))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
+    #in_shape = (512, 512, 3)
+    # Create the base model from the pre-trained model MobileNet V2
+    base_model = tf.keras.applications.MobileNetV2(input_shape=in_shape,
+                                                   include_top=False,
+                                                   weights='imagenet')
+    base_model.trainable = True
 
-    model.add(Dropout(0.1))
+    # Freeze all the layers before the `fine_tune_at` layer
+    for layer in base_model.layers[:FINE_TUNE_POINT]:
+      layer.trainable =  False
+
+    info(f'Number of layers in the base model: {len(base_model.layers)}')
     
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
+    model = Sequential()
 
-    model.add(Dropout(0.1))
-   
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-   
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(DROPOUT))
+    model.add(base_model)
+
+    model.add(GlobalAveragePooling2D())
+
+    model.add(Dropout(0.25))
     model.add(Dense(DATA_FOLDERS)) ### Change to reflect number of folders
     model.add(Activation('sigmoid'))
    
@@ -173,6 +175,14 @@ def build_model():
                   optimizer = 'rmsprop',
                   metrics = ['accuracy'])
     return model
+
+def scheduler(epoch, lr):
+    if epoch > START_SCHEDULER: # if after epoch given
+        return (lr * tf.math.exp(-0.1))
+    else: # for first X epochs
+        # RMSProp default lr = 0.001
+        lr = LEARNING_RATE
+        return lr
 
 
 def train_model(model):
@@ -185,7 +195,10 @@ def train_model(model):
         )
     # Augmentation configuration for testing
     test_datagen = ImageDataGenerator(
-        rescale = 1./255
+        rescale = 1./255,
+        shear_range = 0.2,
+        zoom_range = 0.2,
+        horizontal_flip = True
         )
    
     train_generator = train_datagen.flow_from_directory(
@@ -201,14 +214,29 @@ def train_model(model):
             class_mode = 'categorical')
     
     # Added Early Stopping
-    my_callback = [EarlyStopping(
+    es = EarlyStopping(
         monitor = MONITOR,
         min_delta = MIN_DELTA,
         patience = PATIENCE,
         mode = 'auto',
         baseline = 1,
         restore_best_weights = True,
-        start_from_epoch = START_EARLY_STOPPING)]
+        start_from_epoch = START_EARLY_STOPPING)
+
+    # Added CSV Logger
+    log_path = os.path.join(paths['MODEL_DIR'], f'table_{TIME_LABEL}.csv')
+    csvl = CSVLogger(log_path)
+
+    # Added Learning Rate Scheduler
+    lrs = LearningRateScheduler(scheduler)
+
+    # Added Tensor Board
+    tb_path = os.path.join(paths['MODEL_DIR'], 'tensorboard_logs')
+    os.mkdir(tb_path)
+    tb = TensorBoard(tb_path)
+
+    # Callbacks list
+    callbacks = [es, csvl, lrs, tb]
 
     history_1 = model.fit(
         train_generator,
@@ -216,7 +244,7 @@ def train_model(model):
         epochs = EPOCHS,
         validation_data = validation_generator,
         validation_steps = NB_VALIDATION_SAMPLES // BATCH_SIZE,
-        callbacks = my_callback)
+        callbacks = callbacks)
    
     return model, history_1
    
